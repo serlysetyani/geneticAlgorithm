@@ -51,7 +51,7 @@ def parentSelection(population, xLimit, yLimit, totalChromosome):
     return bestChromosome
 
 def crossover(parent1, parent2, probability):
-    randomPC = random.uniform(0, 9)    # untuk mencari nilai probabilitas crossover yang random
+    randomPC = random.random()    # untuk mencari nilai probabilitas crossover yang random
     if (randomPC < probability):    
         randomPoint = random.randint(1, 5)  # untuk mencari nilai probabilitas point yang random
         for i in range (randomPoint):
@@ -60,15 +60,19 @@ def crossover(parent1, parent2, probability):
             parent2[i] = temp
     return [parent1, parent2]
 
-def mutation(chromosome, mutationProbability):
+def mutation(chromosome1, chromosome2, mutationProbability):
   probRandom = random.random()
+  print (probRandom)
   if probRandom < mutationProbability:
-      gen = random.randint(0,5)
-      genValue = random.randint(0,9)
-      while chromosome[gen] == genValue:
-        genValue = random.randint(0,9)
-      chromosome[gen] = genValue
-  return chromosome
+      gen1, gen2 = random.randint(0,5), random.randint(0,5)
+      genValue1, genValue2 = random.randint(0,9), random.randint(0,9)
+      while chromosome1[gen1] == genValue1:
+        genValue1 = random.randint(0,9)
+      while chromosome2[gen2] == genValue2:
+        genValue2 = random.randint(0,9)
+      chromosome1[gen1] = genValue1
+      chromosome2[gen2] = genValue2
+  return chromosome1, chromosome2
 
 def elitism(fitnessPopulation):
   index = fitnessPopulation.index(max(fitnessPopulation))
@@ -77,8 +81,10 @@ def elitism(fitnessPopulation):
 population = initiate_population(totalChromosome, totalGen)
 chromosome =  initiate_chromosome(totalGen)
 decode = decodeChromosome(chromosome, xLimit, yLimit)
-print ("population :", population)
-print("Chromosome: ", chromosome)
-print("Parents: ", parentSelection(population, xLimit, yLimit, totalChromosome))
-print("Decode: ", decode)
-print("Fitness Value: ", fitnessChromosome(chromosome, xLimit, yLimit))
+
+
+print ("population    : ", population)
+print("Chromosome     : ", chromosome)
+print("Parents        : ", parentSelection(population, xLimit, yLimit, totalChromosome))
+print("Decode         : ", decode)
+print("Fitness Value  : ", fitnessChromosome(chromosome, xLimit, yLimit))
