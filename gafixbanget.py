@@ -1,5 +1,6 @@
 import math
 import random
+import copy
 
 xLimit = [-1, 2]
 yLimit = [-1, 1]
@@ -24,12 +25,12 @@ def initiate_population(totalChromosome, totalGen):  # fungsi untuk mengenerate 
 
 def decodeChromosome(chromosome, xLimit, yLimit):
     divider = 9 * (10**-1 + 10**-2 + 10**-3)
-    multiplierX = (chromosome[0] * (10**-1) + chromosome[1] * (10**-2) + chromosome[2] * (10**-3))
-    multiplierY = (chromosome[3] * (10**-1) + chromosome[4] * (10**-2) + chromosome[5] * (10**-3))
+    multiplierX = chromosome[0] * (10**-1) + chromosome[1] * (10**-2) + chromosome[2] * (10**-3)
+    multiplierY = chromosome[3] * (10**-1) + chromosome[4] * (10**-2) + chromosome[5] * (10**-3)
     decodeX = xLimit[0] + (((xLimit[1] - xLimit[0]) / divider) * multiplierX)
     decodeY = yLimit[0] + (((yLimit[1] - yLimit[0]) / divider) * multiplierY)
     return [decodeX, decodeY]
-  
+
 def fitnessChromosome(chromosome, xLimit, yLimit):
     decode = decodeChromosome(chromosome, xLimit, yLimit)
     fitness = (math.cos(decode[0]**2) * math.sin(decode[1]**2)) + (decode[0] + decode[1])  
@@ -44,7 +45,7 @@ def fitnessPopulation(population, xLimit, yLimit, totalChromosome):
 
 def parentSelection(population, xLimit, yLimit, totalChromosome):
     bestChromosome = []
-    for i in range(totalChromosome-1):
+    for _ in range(totalChromosome):
       chromosome = population[random.randint(0, totalChromosome-1)]
       if (bestChromosome == [] or fitnessChromosome(chromosome, xLimit, yLimit) > fitnessChromosome(bestChromosome, xLimit, yLimit)):
         bestChromosome = chromosome
@@ -62,7 +63,6 @@ def crossover(parent1, parent2, probability):
 
 def mutation(chromosome1, chromosome2, mutationProbability):
   probRandom = random.random()
-  print (probRandom)
   if probRandom < mutationProbability:
       gen1, gen2 = random.randint(0,5), random.randint(0,5)
       genValue1, genValue2 = random.randint(0,9), random.randint(0,9)
@@ -75,16 +75,53 @@ def mutation(chromosome1, chromosome2, mutationProbability):
   return chromosome1, chromosome2
 
 def elitism(fitnessPopulation):
-  index = fitnessPopulation.index(max(fitnessPopulation))
-  return index
+  index1 = fitnessPopulation.index(max(fitnessPopulation))
+  return index1
 
+# =============================== MAIN ==================================
 population = initiate_population(totalChromosome, totalGen)
-chromosome =  initiate_chromosome(totalGen)
-decode = decodeChromosome(chromosome, xLimit, yLimit)
+fitness = fitnessPopulation(population, xLimit, yLimit, totalChromosome)
+indexBest = elitism(fitness)
+bestChromosome = copy.deepcopy(population[indexBest])
+i = 0
+bestGeneration = i
+print ("Generasi     : ", i + 1)
+print ("Fitness      : ", fitness[indexBest]) # menginput fitness terbaik
+print ("Kromosom     : ", population[indexBest]) # menginput kromosom terbaik
+print ("Dekode (X, Y): ", decodeChromosome(population[indexBest], xLimit, yLimit))
+print ("================================================================================")
 
+while i < (totalPopulation - 1):
+  new_population = []
+  new_population.append(population[indexBest])
+  new_population.append(population[indexBest])
+  while len(new_population) <= len(population): 
+    parent1 = parentSelection(population, xLimit, yLimit, totalChromosome) # mencari parent 1
+    parent2 = parentSelection(population, xLimit, yLimit, totalChromosome) # mencari parent 2
+    while parent1 == parent2:
+     parent2 = parentSelection(population, xLimit, yLimit, totalChromosome)
+    offspring = crossover(parent1, parent2, probability)
+    offspring = mutation(offspring[0], offspring[1], mutationProbability)
+    new_population.append(offspring[0])
+    new_population.append(offspring[1])
+  i += 1
+  fitness = fitnessPopulation(new_population, xLimit, yLimit, totalChromosome)
+  indexBest = elitism(fitness)
+  population = new_population
 
-print ("population    : ", population)
-print("Chromosome     : ", chromosome)
-print("Parents        : ", parentSelection(population, xLimit, yLimit, totalChromosome))
-print("Decode         : ", decode)
-print("Fitness Value  : ", fitnessChromosome(chromosome, xLimit, yLimit))
+  print ("Generasi     : ", i + 1)
+  print ("Fitness      : ", fitness[indexBest])
+  print ("Kromosom     : ", new_population[indexBest])
+  print ("Decode (X, Y): ", decodeChromosome(new_population[indexBest], xLimit, yLimit))
+  print ("================================================================================")
+
+  if fitnessChromosome(bestChromosome, xLimit, yLimit) < fitnessChromosome(new_population[indexBest], xLimit, yLimit):
+    bestChromosome = copy.deepcopy(new_population[indexBest])
+    bestGeneration = i
+
+print (" ")
+print ("=============================== Hasil Terbaik ==================================")
+print ("Generasi     : ", bestGeneration + 1)
+print ("Fitness      : ", fitnessChromosome(bestChromosome, xLimit, yLimit))
+print ("Kromosom     : ", bestChromosome)
+print ("Decode (X, Y): ", decodeChromosome(bestChromosome, xLimit, yLimit))
