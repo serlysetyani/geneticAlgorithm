@@ -6,7 +6,7 @@ xLimit = [-1, 2]
 yLimit = [-1, 1]
 totalGen = 6
 totalChromosome = 6
-totalPopulation = 100
+totalPopulation = 250
 probability = 0.65
 mutationProbability = 0.08
 
@@ -91,11 +91,12 @@ print ("Kromosom     : ", population[indexBest]) # menginput kromosom terbaik
 print ("Dekode (X, Y): ", decodeChromosome(population[indexBest], xLimit, yLimit))
 print ("================================================================================")
 
-while i < (totalPopulation - 1):
+while i < (totalPopulation - 1) and fitness[indexBest] < 2.31:
   new_population = []
-  new_population.append(population[indexBest])
-  new_population.append(population[indexBest])
-  while len(new_population) <= len(population): 
+  bespop = copy.deepcopy(population[indexBest])
+  new_population.append(bespop)
+  new_population.append(bespop)
+  while len(new_population) <= len(population)-2: 
     parent1 = parentSelection(population, xLimit, yLimit, totalChromosome) # mencari parent 1
     parent2 = parentSelection(population, xLimit, yLimit, totalChromosome) # mencari parent 2
     while parent1 == parent2:
@@ -108,6 +109,7 @@ while i < (totalPopulation - 1):
   fitness = fitnessPopulation(new_population, xLimit, yLimit, totalChromosome)
   indexBest = elitism(fitness)
   population = new_population
+  print (population)
 
   print ("Generasi     : ", i + 1)
   print ("Fitness      : ", fitness[indexBest])
